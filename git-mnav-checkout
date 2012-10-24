@@ -1,0 +1,53 @@
+#!/usr/bin/python
+
+#Define imports
+import re, string, sys, getpass, os
+from subprocess import call
+
+#Define functions
+def usage():
+    print "Usage:"
+    print sys.argv[0] + "<branch_name> <project>"
+    print ""
+    print "Branch Name: Should be a filed TT item and of the format TT####"
+    quit(1)
+
+def dprint( message ):
+    #Comment out the following line for a "release build"
+    print message
+    return
+
+#Start the program here
+print "Starting " + sys.argv[0]
+
+#Ensure arguments are correct and store them
+if len(sys.argv) != 3:
+    usage()
+branch_prefix = sys.argv[1]
+project_branch = sys.argv[2]
+dprint ("project branch: " + project_branch)
+
+# Create the branch name
+user = os.getlogin()
+task_branch = branch_prefix + "_" + user
+dprint ("Task branch name: " + task_branch)
+
+
+# Update to the Product or master branch if product branch doesn't exist
+#TODO: Do this more intelligently
+print ""
+git_checkout_master = "git submodule foreach git checkout master || :"
+call(git_checkout_master, shell=True)
+
+git_checkout_project = "git submodule foreach git checkout " + project_branch + " || :"
+call(git_checkout_project, shell=True)
+print ""
+
+print "Completed updating to baseline branches, creating task level branches" 
+
+# Now create the task level branch "TT####_Username" and update to it
+git_checkout_task = "git submodule foreach git checkout -b" + task_branch + " || :"
+call(git_checkout_task, shell=True)
+
+# Done with checkout
+print "Checkout Complete"
