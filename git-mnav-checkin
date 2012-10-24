@@ -1,7 +1,8 @@
 #!/usr/bin/python
 #
-# This script will create a task branch for a developer to work on
+# This script will commit a task branch and merge it to the parent
 #
+
 
 #Define imports
 import re, string, sys, getpass, os
@@ -9,13 +10,14 @@ from subprocess import call
 from subprocess import Popen
 from subprocess import check_output
 
+#TODO Handle reverting changes if script fails
+
 #Define functions
 def usage():
     print "Usage:"
-    print sys.argv[0] + "<branch_name> <project>"
+    print sys.argv[0] + "[project]"
     print ""
-    print "Branch Name: Should be a filed TT item and of the format TT####"
-    print "Project: The name of the project you are working on (ENT, Cranial, ENT_Prototype, etc ...)"
+    print "Project: This will default to the parent of your branch, only give this argument if you are sure you want to add your code to a different project"
     quit(1)
 
 def dprint( message ):
@@ -27,16 +29,16 @@ def dprint( message ):
 print "Starting " + sys.argv[0]
 
 #Ensure arguments are correct and store them
-if len(sys.argv) != 3:
-    usage()
-branch_prefix = sys.argv[1]
-project_branch = sys.argv[2]
+if len(sys.argv) != 1:
+    if len(sys.argv) != 2:
+        usage()
+    else
+        print "Are you sure you want to merge your code to: " + project_branch
+
+project_branch = sys.argv[1]
 dprint ("project branch: " + project_branch)
 
-#TODO: check the project_branch name before we get too deep
-
-
-# Create the branch name
+# Get the current branch name
 user = os.getlogin()
 task_branch = branch_prefix + "_" + user
 dprint ("Task branch name: " + task_branch)
@@ -50,7 +52,7 @@ dprint("List of submodules:\n" + submodules)
 ##################################
 
 # Update the superproject to the master branch
-result_output = check_output ("git checkout master", shell=True)
+result_output = check_output ("git checkout master", stderr=subprocess.STDOUT, shell=True)
 dprint("Result Output of git checkout master:\n" + result_output)
 
 # Update submodules to the product branch if it exists, else update to the  master branch
